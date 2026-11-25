@@ -38,11 +38,6 @@ def not_found(message: str = "Recurso no encontrado.") -> ApiError:
     return ApiError(404, "NOT_FOUND", message)
 
 
-def not_implemented(route: str) -> ApiError:
-    """Solo existe durante el esqueleto (M0); desaparece cuando todas las rutas estén implementadas."""
-    return ApiError(501, "NOT_IMPLEMENTED", f"La ruta {route} todavía no está implementada.")
-
-
 def _json_default(value: Any) -> Any:
     # DynamoDB devuelve Decimal; todos nuestros números son enteros (precios COP, cantidades).
     if isinstance(value, Decimal):

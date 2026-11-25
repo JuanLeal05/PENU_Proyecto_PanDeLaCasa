@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from conftest import TEST_ENV
+from conftest import TEST_ENV, read_catalog
 
 BACKEND = Path(__file__).resolve().parents[2]
 SCRIPT = BACKEND / "scripts" / "seed_products.py"
@@ -115,3 +115,27 @@ def test_archivo_invalido_devuelve_2(seed_module, tmp_path, capsys):
     bad.write_text("[]")
     assert seed_module.main(["--table", "x", "--file", str(bad)]) == 2
     assert "Error" in capsys.readouterr().err
+
+
+def test_seed_publica_catalogo(seed_module, ddb, assets_bucket, capsys):
+    args = [
+        "--table",
+        TEST_ENV["PRODUCTS_TABLE"],
+        "--file",
+        str(SEED),
+        "--publish-catalog",
+        "--bucket",
+        TEST_ENV["ASSETS_BUCKET"],
+        "--assets-base-url",
+        "https://cdn.example.test/",
+    ]
+    assert seed_module.main(args) == 0
+    catalog = read_catalog(assets_bucket)
+    assert len(catalog["body"]["products"]) == len(json.loads(SEED.read_text()))
+    assert catalog["CacheControl"] == "max-age=60"
+    assert "catalog.json publicado" in capsys.readouterr().out
+
+
+def test_publish_catalog_exige_bucket(seed_module):
+    with pytest.raises(SystemExit):
+        seed_module.main(["--table", "x", "--publish-catalog"])

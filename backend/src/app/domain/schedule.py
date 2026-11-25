@@ -2,9 +2,10 @@
 
 import re
 from collections.abc import Mapping
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from app.config import Settings, load_settings
+from app.http import validation_error
 
 SLOT_RE = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 
@@ -28,6 +29,19 @@ def all_slots(settings: Settings | None = None) -> list[str]:
 def today(now: datetime) -> str:
     """Fecha de Bogotá en formato ``YYYY-MM-DD`` (``now`` ya viene en UTC−5)."""
     return now.date().isoformat()
+
+
+def date_or_today(raw: str | None, now: datetime) -> str:
+    """Parámetro ``date`` opcional (``YYYY-MM-DD``); por defecto, hoy en Bogotá."""
+    if not raw:
+        return today(now)
+    try:
+        parsed = date.fromisoformat(raw)
+    except ValueError:
+        parsed = None
+    if parsed is None or len(raw) != 10:
+        raise validation_error("La fecha debe tener el formato YYYY-MM-DD.", ["date"])
+    return parsed.isoformat()
 
 
 def is_store_open(now: datetime, settings: Settings | None = None) -> bool:

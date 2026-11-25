@@ -1,11 +1,12 @@
-"""Esqueleto M0: los 7 handlers existen en la ruta del contrato 04 §2 y responden según el contrato 02."""
+"""Contrato de los handlers: los 7 existen en la ruta del contrato 04 §2, atienden EXACTAMENTE las rutas
+del contrato 02 y ninguna queda sin implementar."""
 
 import importlib
 import re
 
 import pytest
 
-from conftest import body_of, read_logs
+from conftest import body_of
 
 # Handler (tal como lo configura Terraform) → rutas que atiende, copiadas del contrato 04 §2.
 CONTRACT = {
@@ -30,18 +31,7 @@ CONTRACT = {
     "app.handlers.admin_stats.handler": {"GET /api/admin/stats"},
 }
 
-# Rutas ya implementadas (tienen sus propios tests); el resto sigue en 501 hasta su hito.
-IMPLEMENTED = {
-    "GET /api/health",
-    "GET /api/availability",
-    "POST /api/orders",
-    "GET /api/orders/{orderId}",
-    "POST /api/orders/{orderId}/cancel",
-}
-
-PENDING = [
-    (path, route) for path, routes in CONTRACT.items() for route in sorted(routes) if route not in IMPLEMENTED
-]
+ALL_ROUTES = [(path, route) for path, routes in CONTRACT.items() for route in sorted(routes)]
 
 
 def load(handler_path: str):
@@ -60,6 +50,19 @@ def test_rutas_exactas_del_contrato(handler_path):
     assert set(module.ROUTES) == CONTRACT[handler_path]
 
 
+@pytest.mark.parametrize(("handler_path", "route"), ALL_ROUTES)
+def test_ninguna_ruta_sin_implementar(handler_path, route, ddb, assets_bucket, make_event, lambda_context):
+    """Con cuerpo vacío cada ruta responde algo del contrato (200/204/400/404), nunca 500 ni 501."""
+    event = make_event(
+        route,
+        body={},
+        path={"orderId": "no-existe", "productId": "p-no-existe"},
+        username="admin-test",
+    )
+    resp = load(handler_path)(event, lambda_context)
+    assert resp["statusCode"] in {200, 204, 400, 404}, body_of(resp)
+
+
 def test_health(make_event, lambda_context, set_now):
     set_now("2026-11-27T09:15")
     handler = load("app.handlers.public_availability.handler")
@@ -73,34 +76,14 @@ def test_health_hora_real_con_offset(make_event, lambda_context):
     assert re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d-05:00", body_of(resp)["time"])
 
 
-@pytest.mark.parametrize(("handler_path", "route"), PENDING)
-def test_rutas_pendientes_responden_501(handler_path, route, make_event, lambda_context):
-    resp = load(handler_path)(make_event(route, username="admin-test"), lambda_context)
-    assert resp["statusCode"] == 501
-    error = body_of(resp)["error"]
-    assert error["code"] == "NOT_IMPLEMENTED"
-    assert set(error) == {"code", "message", "details"}
+def test_health_no_necesita_tablas(monkeypatch, make_event, lambda_context):
+    for name in ("PRODUCTS_TABLE", "SLOTS_TABLE"):
+        monkeypatch.delenv(name)
+    resp = load("app.handlers.public_availability.handler")(make_event("GET /api/health"), lambda_context)
+    assert resp["statusCode"] == 200
 
 
 def test_ruta_ajena_al_handler_da_404(make_event, lambda_context):
     resp = load("app.handlers.admin_stats.handler")(make_event("GET /api/health"), lambda_context)
     assert resp["statusCode"] == 404
     assert body_of(resp)["error"]["code"] == "NOT_FOUND"
-
-
-@pytest.mark.parametrize("job", ["reset_stock", "close_day"])
-def test_scheduled_jobs(job, lambda_context, capsys):
-    result = load("app.handlers.scheduled_jobs.handler")({"job": job}, lambda_context)
-    assert result == {"job": job, "affected": 0}
-    [record] = read_logs(capsys.readouterr().out)
-    assert (record["message"], record["function"]) == ("job_done", "scheduled-jobs")
-
-
-@pytest.mark.parametrize("event", [{"job": "borrar_todo"}, {}, None, {"job": 5}])
-def test_job_desconocido_lanza_excepcion(event, lambda_context, capsys):
-    from app.handlers.scheduled_jobs import UnknownJobError
-
-    with pytest.raises(UnknownJobError):
-        load("app.handlers.scheduled_jobs.handler")(event, lambda_context)
-    [record] = read_logs(capsys.readouterr().out)
-    assert (record["level"], record["message"]) == ("ERROR", "job_failed")

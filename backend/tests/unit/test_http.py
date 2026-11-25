@@ -75,9 +75,9 @@ def _demo_handler():
         raise RuntimeError("boom")
 
     def no_impl(event, log):
-        raise ApiError(501, "NOT_IMPLEMENTED", "pendiente")
+        raise ApiError(500, "INTERNAL_ERROR", "falló una dependencia")
 
-    routes = {"GET /ok": ok, "GET /negocio": negocio, "GET /falla": falla, "GET /501": no_impl}
+    routes = {"GET /ok": ok, "GET /negocio": negocio, "GET /falla": falla, "GET /500": no_impl}
 
     @api_handler("demo")
     def handler(event, log):
@@ -118,8 +118,8 @@ def test_api_handler_error_no_controlado(make_event, lambda_context, capsys):
 
 
 def test_api_handler_5xx_de_negocio_es_error(make_event, lambda_context, capsys):
-    resp = _demo_handler()(make_event("GET /501"), lambda_context)
-    assert resp["statusCode"] == 501
+    resp = _demo_handler()(make_event("GET /500"), lambda_context)
+    assert resp["statusCode"] == 500
     assert read_logs(capsys.readouterr().out)[0]["level"] == "ERROR"
 
 

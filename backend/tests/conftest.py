@@ -90,7 +90,8 @@ def make_event() -> Callable[..., dict[str, Any]]:
 
 def read_logs(captured: str) -> list[dict[str, Any]]:
     """Convierte la salida capturada (una línea JSON por evento) en dicts."""
-    return [json.loads(line) for line in captured.splitlines() if line.startswith("{")]
+    records = [json.loads(line) for line in captured.splitlines() if line.startswith("{")]
+    return [record for record in records if "_aws" not in record]  # las líneas EMF no son logs
 
 
 def body_of(response: dict[str, Any]) -> Any:
@@ -218,3 +219,43 @@ def as_plain(value: Any) -> Any:
     if isinstance(value, dict):
         return {k: as_plain(v) for k, v in value.items()}
     return value
+
+
+@pytest.fixture
+def assets_bucket(ddb: Any) -> Any:
+    """Bucket de assets simulado (dentro del mismo ``mock_aws`` de ``ddb``). Devuelve el cliente S3."""
+    client = boto3.client("s3", region_name="us-east-1")
+    client.create_bucket(Bucket=TEST_ENV["ASSETS_BUCKET"])
+    return client
+
+
+def read_catalog(s3_client: Any) -> dict[str, Any]:
+    obj = s3_client.get_object(Bucket=TEST_ENV["ASSETS_BUCKET"], Key="assets/catalog/catalog.json")
+    return {
+        "body": json.loads(obj["Body"].read()),
+        "ContentType": obj["ContentType"],
+        "CacheControl": obj.get("CacheControl"),
+    }
+
+
+@pytest.fixture
+def place_order(products: Any, make_event: Callable[..., dict[str, Any]], lambda_context: Any, set_now: Any):
+    """Crea pedidos REALES con el handler create-order: ``place_order("10:00", [("p-croissant", 2)])``."""
+    import uuid
+
+    from app.handlers import create_order
+
+    def _place(slot: str = "10:00", lines: Any = (("p-croissant", 1),), at: str = "2026-11-27T08:00") -> dict:
+        set_now(at)
+        body = {
+            "customer": {"name": "Cliente Prueba", "phone": "3009998877"},
+            "pickupSlot": slot,
+            "items": [{"productId": pid, "quantity": qty} for pid, qty in lines],
+            "dataConsent": True,
+        }
+        event = make_event("POST /api/orders", body=body, headers={"Idempotency-Key": str(uuid.uuid4())})
+        response = create_order.handler(event, lambda_context)
+        assert response["statusCode"] == 201, response
+        return json.loads(response["body"])
+
+    return _place
