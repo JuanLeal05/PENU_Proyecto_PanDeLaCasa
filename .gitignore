@@ -45,3 +45,7 @@ dist/
 
 # --- HLD: HLD.md es intermedio (lo genera build_hld.sh); HLD.pdf sí se versiona ---
 docs/hld/HLD.md
+
+# --- Bootstrap: tfvars con correos personales (se versiona el .example) ---
+infra/bootstrap/terraform.tfvars
+.build/
