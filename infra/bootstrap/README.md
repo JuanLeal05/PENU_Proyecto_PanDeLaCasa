@@ -33,7 +33,7 @@ Variables del repositorio (*Settings → Secrets and variables → Actions → V
 
 | Variable | Valor |
 |---|---|
-| `AWS_REGION` | `us-east-1` |
+| `AWS_REGION` | `us-east-2` |
 | `TF_STATE_BUCKET` | output `state_bucket` |
 | `AWS_PLAN_ROLE_ARN` | output `plan_role_arn` |
 

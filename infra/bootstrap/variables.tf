@@ -1,7 +1,7 @@
 variable "aws_region" {
-  description = "Región de AWS (contrato 04 §9.3: todo en us-east-1)."
+  description = "Región de AWS. CR-001: us-east-2 por política de cuentas nuevas (el contrato 04 §9.3 decía us-east-1)."
   type        = string
-  default     = "us-east-1"
+  default     = "us-east-2"
 }
 
 variable "github_owner" {
