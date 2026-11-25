@@ -1,0 +1,41 @@
+# --- Sistema operativo y editores ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.egg-info/
+
+# --- Configuración y secretos ---
+.env
+.env.*
+config.js
+!**/config.example.js
+
+# --- Terraform ---
+.terraform/
+*.tfstate
+*.tfstate.*
+# Los tfvars de envs/{dev,prod} SÍ se versionan (contrato 04 §1); solo se ignoran
+# los locales o con datos personales (p. ej. el email de alarmas).
+*.local.tfvars
+*.secret.tfvars
+*.auto.tfvars
+crash.log
+*.tfplan
+outputs.json
+
+# --- Artefactos ---
+dist/
+*.zip
