@@ -42,3 +42,6 @@ dist/
 
 # --- Herramientas locales del agente (Claude Code) ---
 .claude/
+
+# --- HLD: HLD.md es intermedio (lo genera build_hld.sh); HLD.pdf sí se versiona ---
+docs/hld/HLD.md
