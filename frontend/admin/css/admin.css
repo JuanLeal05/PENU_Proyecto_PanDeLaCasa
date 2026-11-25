@@ -1,0 +1,54 @@
+/* Pan de la Casa · panel de administración. */
+:root {
+  --color-fondo: #f6f3ef;
+  --color-superficie: #ffffff;
+  --color-texto: #2f241b;
+  --color-suave: #6e5a4a;
+  --color-marca: #7a3d20;
+  --color-borde: #e2d7c9;
+  --radio: 10px;
+  --fuente: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fuente);
+  line-height: 1.5;
+  color: var(--color-texto);
+  background: var(--color-fondo);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-marca);
+  outline-offset: 2px;
+}
+
+.barra {
+  padding: 0.75rem 1rem;
+  color: #fff;
+  background: var(--color-marca);
+}
+
+.barra h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.contenido {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.tarjeta {
+  padding: 1.25rem;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+}
