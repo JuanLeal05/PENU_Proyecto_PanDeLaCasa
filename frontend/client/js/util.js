@@ -118,13 +118,16 @@ export function todayInBogota() {
   return parts; // en-CA ya formatea como YYYY-MM-DD
 }
 
-/** Solo URLs http(s) o relativas al sitio; descarta cualquier otro esquema. */
+/**
+ * Solo URLs http(s), relativas al sitio o blob: (generadas por la propia página, p. ej. la vista
+ * previa de una foto en el panel); descarta cualquier otro esquema (javascript:, data:, …).
+ */
 export function safeUrl(url) {
   if (typeof url !== "string" || !url) return null;
   if (url.startsWith("/") && !url.startsWith("//")) return url;
   try {
     const parsed = new URL(url);
-    return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.href : null;
+    return ["https:", "http:", "blob:"].includes(parsed.protocol) ? parsed.href : null;
   } catch {
     return null;
   }
