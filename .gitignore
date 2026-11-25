@@ -39,3 +39,6 @@ outputs.json
 # --- Artefactos ---
 dist/
 *.zip
+
+# --- Herramientas locales del agente (Claude Code) ---
+.claude/

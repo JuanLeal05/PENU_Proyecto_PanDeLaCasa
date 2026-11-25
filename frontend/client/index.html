@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pan de la Casa · Pedidos para recoger</title>
     <meta name="description" content="Haz tu pedido en Pan de la Casa y recógelo en tienda a la hora que elijas." />
+    <meta name="theme-color" content="#7a3d20" />
     <link rel="stylesheet" href="/css/styles.css" />
     <!-- La configuración (URLs de la API y del CDN) llega SOLO por /config.js, que genera el pipeline. -->
     <script src="/config.js"></script>
+    <script type="module" src="/js/main.js"></script>
   </head>
   <body>
     <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -18,17 +20,84 @@
     </p>
 
     <header class="encabezado">
-      <h1>Pan de la Casa</h1>
-      <p>Pan fresco del día, listo para recoger en tu franja de 30 minutos.</p>
+      <div>
+        <h1>Pan de la Casa</h1>
+        <p>Pan fresco del día, listo para recoger en tu franja de 30 minutos.</p>
+      </div>
+      <a class="enlace-mis-pedidos" href="#mis-pedidos">Mis pedidos de hoy</a>
     </header>
 
-    <main id="contenido" class="contenido">
-      <section class="tarjeta" aria-labelledby="catalogo-titulo">
-        <h2 id="catalogo-titulo">Catálogo</h2>
-        <p>Estamos horneando la tienda en línea. Muy pronto podrás armar tu pedido aquí.</p>
-        <p><a href="/pedido.html">Consultar un pedido</a></p>
+    <p id="estado-tienda" class="aviso" role="status" aria-live="polite" hidden></p>
+
+    <main id="contenido" class="layout">
+      <section class="catalogo" aria-labelledby="catalogo-titulo">
+        <h2 id="catalogo-titulo" class="visualmente-oculto">Catálogo</h2>
+        <div id="lista-productos" aria-busy="true">
+          <p class="cargando">Cargando el pan del día…</p>
+        </div>
       </section>
+
+      <aside id="carrito" class="carrito" aria-labelledby="carrito-titulo">
+        <h2 id="carrito-titulo" tabindex="-1">Tu pedido</h2>
+        <ul id="lineas" class="lineas" role="list"></ul>
+        <p class="carrito__total">Total <span id="total">$ 0</span></p>
+        <p id="resumen-limites" class="carrito__limites"></p>
+        <p class="carrito__pago">Pagas en la tienda al recoger.</p>
+
+        <form id="checkout" class="formulario" novalidate>
+          <div class="campo">
+            <label for="franja">Franja de recogida (hoy)</label>
+            <select id="franja" name="franja" required aria-describedby="franja-error"></select>
+            <p id="franja-error" class="campo__error" hidden></p>
+          </div>
+
+          <div class="campo">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" type="text" autocomplete="name" maxlength="60" required
+                   aria-describedby="nombre-error" />
+            <p id="nombre-error" class="campo__error" hidden></p>
+          </div>
+
+          <div class="campo">
+            <label for="celular">Celular</label>
+            <input id="celular" name="celular" type="tel" inputmode="numeric" autocomplete="tel-national"
+                   maxlength="10" placeholder="3001234567" required aria-describedby="celular-ayuda celular-error" />
+            <p id="celular-ayuda" class="campo__ayuda">10 dígitos, empieza por 3. Solo lo usamos para tu pedido.</p>
+            <p id="celular-error" class="campo__error" hidden></p>
+          </div>
+
+          <div class="campo">
+            <label for="email">Correo <span class="opcional">(opcional)</span></label>
+            <input id="email" name="email" type="email" autocomplete="email" maxlength="254"
+                   aria-describedby="email-error" />
+            <p id="email-error" class="campo__error" hidden></p>
+          </div>
+
+          <div class="campo campo--check">
+            <input id="consentimiento" name="consentimiento" type="checkbox" required
+                   aria-describedby="consentimiento-error" />
+            <label for="consentimiento">
+              Autorizo el tratamiento de mis datos personales para gestionar este pedido (Ley 1581 de 2012).
+            </label>
+            <p id="consentimiento-error" class="campo__error" hidden></p>
+          </div>
+
+          <p id="mensaje-checkout" class="aviso" role="alert" hidden></p>
+          <button id="confirmar" class="boton boton--primario boton--ancho" type="submit" disabled>
+            Confirmar pedido
+          </button>
+        </form>
+      </aside>
     </main>
+
+    <section id="mis-pedidos" class="mis-pedidos-seccion" aria-labelledby="mis-pedidos-titulo">
+      <h2 id="mis-pedidos-titulo">Mis pedidos de hoy</h2>
+      <div id="lista-mis-pedidos"></div>
+    </section>
+
+    <button id="barra-carrito" class="barra-carrito" type="button" hidden>
+      <span id="barra-carrito-texto">Ver pedido</span>
+    </button>
 
     <footer class="pie">
       <p>Pan de la Casa · Bogotá · Pago en tienda al recoger.</p>
