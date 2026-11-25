@@ -30,11 +30,17 @@ CONTRACT = {
     "app.handlers.admin_stats.handler": {"GET /api/admin/stats"},
 }
 
+# Rutas ya implementadas (tienen sus propios tests); el resto sigue en 501 hasta su hito.
+IMPLEMENTED = {
+    "GET /api/health",
+    "GET /api/availability",
+    "POST /api/orders",
+    "GET /api/orders/{orderId}",
+    "POST /api/orders/{orderId}/cancel",
+}
+
 PENDING = [
-    (path, route)
-    for path, routes in CONTRACT.items()
-    for route in sorted(routes)
-    if route != "GET /api/health"
+    (path, route) for path, routes in CONTRACT.items() for route in sorted(routes) if route not in IMPLEMENTED
 ]
 
 
@@ -77,7 +83,7 @@ def test_rutas_pendientes_responden_501(handler_path, route, make_event, lambda_
 
 
 def test_ruta_ajena_al_handler_da_404(make_event, lambda_context):
-    resp = load("app.handlers.create_order.handler")(make_event("GET /api/health"), lambda_context)
+    resp = load("app.handlers.admin_stats.handler")(make_event("GET /api/health"), lambda_context)
     assert resp["statusCode"] == 404
     assert body_of(resp)["error"]["code"] == "NOT_FOUND"
 

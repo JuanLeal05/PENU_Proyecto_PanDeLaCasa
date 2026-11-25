@@ -4,8 +4,10 @@ from typing import Any
 
 from app import clock
 from app.config import load_settings
-from app.http import Response, api_handler, dispatch, json_response, not_implemented
+from app.domain.schedule import build_availability, today
+from app.http import Response, api_handler, dispatch, json_response
 from app.observability import Logger
+from app.repositories import products_repo, slots_repo
 
 
 def health(event: dict[str, Any], log: Logger) -> Response:
@@ -14,7 +16,11 @@ def health(event: dict[str, Any], log: Logger) -> Response:
 
 
 def availability(event: dict[str, Any], log: Logger) -> Response:
-    raise not_implemented(event["routeKey"])
+    """Disponibilidad de HOY: cupos por franja y stock de productos activos (no el catálogo)."""
+    now = clock.now()
+    counts = slots_repo.counts_for(today(now))
+    stock = products_repo.active_stock()
+    return json_response(200, build_availability(now, counts, stock))
 
 
 ROUTES = {
