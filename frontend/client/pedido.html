@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pan de la Casa · Seguimiento de tu pedido</title>
+    <meta name="robots" content="noindex" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="theme-color" content="#7a3d20" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script src="/config.js"></script>
+    <script type="module" src="/js/order.js"></script>
+  </head>
+  <body>
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+
+    <header class="encabezado">
+      <div>
+        <h1>Pan de la Casa</h1>
+        <p>Seguimiento de tu pedido</p>
+      </div>
+      <a class="enlace-mis-pedidos" href="/index.html">Volver al catálogo</a>
+    </header>
+
+    <main id="contenido" class="contenido">
+      <section class="tarjeta pedido" aria-labelledby="pedido-titulo">
+        <h2 id="pedido-titulo" class="visualmente-oculto">Tu pedido</h2>
+        <p id="mensaje-pedido" class="aviso" role="status" aria-live="polite" hidden></p>
+        <div id="pedido" aria-live="polite">
+          <p class="cargando">Consultando tu pedido…</p>
+        </div>
+        <div class="pedido__acciones">
+          <button id="actualizar" class="boton boton--secundario" type="button">Actualizar ahora</button>
+          <button id="cancelar" class="boton boton--peligro" type="button" hidden>Cancelar pedido</button>
+        </div>
+        <p id="ultima-actualizacion" class="pedido__nota"></p>
+      </section>
+    </main>
+
+    <footer class="pie">
+      <p>Pan de la Casa · Bogotá · Pago en tienda al recoger.</p>
+    </footer>
+  </body>
+</html>

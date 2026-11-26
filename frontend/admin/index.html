@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pan de la Casa · Panel de administración</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="theme-color" content="#7a3d20" />
+    <link rel="stylesheet" href="/admin/css/admin.css" />
+    <!-- Mismo /config.js de la raíz (ruta absoluta), contrato 04 §5. -->
+    <script src="/config.js"></script>
+    <script type="module" src="/admin/js/main.js"></script>
+  </head>
+  <body>
+    <a class="saltar" href="#vista">Saltar al contenido</a>
+
+    <header class="barra">
+      <h1>Pan de la Casa · Administración</h1>
+    </header>
+
+    <!-- Pantalla de inicio de sesión (Cognito Hosted UI) -->
+    <main id="pantalla-login" class="contenido login" hidden>
+      <section class="tarjeta" aria-labelledby="login-titulo">
+        <h2 id="login-titulo">Ingreso del personal</h2>
+        <p>Usa tu usuario de la panadería. No hay registro público.</p>
+        <p id="mensaje-login" class="aviso" role="alert" hidden></p>
+        <button id="boton-login" class="boton boton--primario" type="button">Iniciar sesión</button>
+      </section>
+    </main>
+
+    <!-- Panel -->
+    <div id="pantalla-app" hidden>
+      <nav class="nav" aria-label="Secciones del panel">
+        <ul role="list">
+          <li><a href="#/pedidos">Pedidos</a></li>
+          <li><a href="#/productos">Productos</a></li>
+          <li><a href="#/inventario">Inventario</a></li>
+          <li><a href="#/estadisticas">Estadísticas</a></li>
+        </ul>
+        <div class="nav__sesion">
+          <span id="usuario" class="nav__usuario"></span>
+          <button id="boton-logout" class="boton boton--claro" type="button">Cerrar sesión</button>
+        </div>
+      </nav>
+      <p id="notificacion" class="aviso notificacion" role="status" aria-live="polite" hidden></p>
+      <main id="vista" class="contenido vista"></main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+[
+  { "productId": "p-pan-frances", "name": "Pan francés", "description": "Baguette pequeña de corteza crujiente, horneada en la madrugada.", "category": "Panes", "price": 800, "dailyProduction": 120, "active": true },
+  { "productId": "p-pan-queso", "name": "Pan de queso", "description": "Pan suave relleno de queso campesino.", "category": "Panes", "price": 1500, "dailyProduction": 80, "active": true },
+  { "productId": "p-almojabana", "name": "Almojábana", "description": "Tradicional almojábana de cuajada, recién salida del horno.", "category": "Panes", "price": 2500, "dailyProduction": 60, "active": true },
+  { "productId": "p-pandebono", "name": "Pandebono", "description": "Pandebono vallecaucano de almidón de yuca y queso.", "category": "Panes", "price": 2500, "dailyProduction": 60, "active": true },
+  { "productId": "p-mogolla-integral", "name": "Mogolla integral", "description": "Mogolla de harina integral con salvado.", "category": "Panes", "price": 1200, "dailyProduction": 50, "active": true },
+  { "productId": "p-croissant", "name": "Croissant", "description": "Hojaldre de mantequilla francesa.", "category": "Hojaldres", "price": 4500, "dailyProduction": 60, "active": true },
+  { "productId": "p-roscon-arequipe", "name": "Roscón de arequipe", "description": "Roscón azucarado relleno de arequipe.", "category": "Hojaldres", "price": 3500, "dailyProduction": 40, "active": true },
+  { "productId": "p-torta-zanahoria", "name": "Torta de zanahoria (porción)", "description": "Porción de torta de zanahoria con nueces y cobertura de queso crema.", "category": "Tortas", "price": 6000, "dailyProduction": 24, "active": true },
+  { "productId": "p-mantecada", "name": "Mantecada", "description": "Mantecada casera esponjosa.", "category": "Tortas", "price": 3000, "dailyProduction": 30, "active": true },
+  { "productId": "p-galletas-avena", "name": "Galletas de avena (x6)", "description": "Paquete de seis galletas de avena y uvas pasas.", "category": "Galletas", "price": 5000, "dailyProduction": 20, "active": true },
+  { "productId": "p-chocolate-caliente", "name": "Chocolate caliente", "description": "Chocolate santafereño en taza grande.", "category": "Bebidas", "price": 4000, "dailyProduction": 50, "active": true },
+  { "productId": "p-cafe-tinto", "name": "Café tinto", "description": "Tinto colombiano recién colado.", "category": "Bebidas", "price": 2500, "dailyProduction": 80, "active": true }
+]
