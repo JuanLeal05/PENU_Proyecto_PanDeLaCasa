@@ -58,8 +58,12 @@ jobs:
           aws s3 cp frontend/admin/index.html "s3://$WEB/admin/index.html" --cache-control "no-cache" --content-type "text/html"
       - name: Invalidar CloudFront
         run: |
-          aws cloudfront create-invalidation \
-            --distribution-id "$(jq -r .cloudfront_distribution_id.value outputs.json)" --paths "/*"
+          DIST_ID="$(jq -r .cloudfront_distribution_id.value outputs.json)"
+          if [ -n "$DIST_ID" ]; then
+            aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths "/*"
+          else
+            echo "Sin distribución CloudFront (CR-002); se omite invalidación."
+          fi
       - name: Smoke test
         run: bash scripts/smoke_test.sh outputs.json
       - name: Resumen

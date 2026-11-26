@@ -9,8 +9,14 @@ locals {
   web_bucket_name    = "${local.prefix}-web-${local.account_id}"
   assets_bucket_name = "${local.prefix}-assets-${local.account_id}"
 
-  cloudfront_origin = "https://${aws_cloudfront_distribution.main.domain_name}"
-  cors_origins      = concat([local.cloudfront_origin], var.extra_cors_origins)
+  # Sin CloudFront (CR-002), el mismo HTTP API sirve los sitios por HTTPS.
+  web_domain        = var.enable_cloudfront ? aws_cloudfront_distribution.main[0].domain_name : replace(aws_apigatewayv2_api.api.api_endpoint, "https://", "")
+  cloudfront_origin = "https://${local.web_domain}"
+  api_cors_origins = concat(
+    [for d in aws_cloudfront_distribution.main : "https://${d.domain_name}"],
+    var.extra_cors_origins,
+  )
+  cors_origins = concat([local.cloudfront_origin], var.extra_cors_origins)
 
   # Las 7 funciones del contrato 04 §2: clave => handler.
   lambdas = {

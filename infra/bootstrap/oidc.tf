@@ -10,12 +10,13 @@ resource "aws_iam_openid_connect_provider" "github" {
 
 locals {
   oidc_provider_arn = aws_iam_openid_connect_provider.github.arn
+  sub_prefix        = var.github_oidc_sub_prefix != "" ? var.github_oidc_sub_prefix : "repo:${local.github_repo}"
 
   # Una confianza por rol: cada uno solo lo asume el "sub" indicado.
   oidc_subjects = {
-    plan = "repo:${local.github_repo}:pull_request"
-    dev  = "repo:${local.github_repo}:environment:dev"
-    prod = "repo:${local.github_repo}:environment:prod"
+    plan = "${local.sub_prefix}:pull_request"
+    dev  = "${local.sub_prefix}:environment:dev"
+    prod = "${local.sub_prefix}:environment:prod"
   }
 }
 

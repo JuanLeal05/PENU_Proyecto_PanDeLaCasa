@@ -100,24 +100,28 @@ resource "aws_s3_bucket_cors_configuration" "assets" {
   }
 }
 
-# Solo CloudFront (OAC) lee los buckets.
+# Solo CloudFront (OAC) o el rol web-proxy (CR-002) leen los buckets.
 data "aws_iam_policy_document" "bucket_read" {
   for_each = local.bucket_ids
 
-  statement {
-    sid       = "LecturaSoloCloudFront"
-    actions   = ["s3:GetObject"]
-    resources = ["arn:aws:s3:::${each.value}/*"]
+  dynamic "statement" {
+    for_each = var.enable_cloudfront ? [1] : []
 
-    principals {
-      type        = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
-    }
+    content {
+      sid       = "LecturaSoloCloudFront"
+      actions   = ["s3:GetObject"]
+      resources = ["arn:aws:s3:::${each.value}/*"]
 
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceArn"
-      values   = [aws_cloudfront_distribution.main.arn]
+      principals {
+        type        = "Service"
+        identifiers = ["cloudfront.amazonaws.com"]
+      }
+
+      condition {
+        test     = "StringEquals"
+        variable = "AWS:SourceArn"
+        values   = [aws_cloudfront_distribution.main[0].arn]
+      }
     }
   }
 
