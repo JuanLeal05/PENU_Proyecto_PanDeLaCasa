@@ -14,6 +14,12 @@ variable "github_repo" {
   type        = string
 }
 
+variable "github_oidc_sub_prefix" {
+  description = "Prefijo del claim sub OIDC si la org usa immutable subject (ej. repo:org@id/repo@id). Vacío usa repo:<owner>/<repo>."
+  type        = string
+  default     = ""
+}
+
 variable "budget_emails" {
   description = "Correos que reciben las alertas del presupuesto mensual."
   type        = list(string)
