@@ -55,6 +55,7 @@ locals {
     SLOTS_TABLE          = aws_dynamodb_table.slots.name
     IDEMPOTENCY_TABLE    = aws_dynamodb_table.idempotency.name
     ASSETS_BUCKET        = aws_s3_bucket.assets.id
+    AWS_ENDPOINT_URL_S3  = "https://s3.${local.region}.amazonaws.com"
     CATALOG_KEY          = "assets/catalog/catalog.json"
     IMAGES_PREFIX        = "assets/images/"
     ASSETS_BASE_URL      = local.cloudfront_origin
@@ -77,7 +78,7 @@ locals {
     "create-order"        = concat(["PRODUCTS_TABLE", "ORDERS_TABLE", "SLOTS_TABLE", "IDEMPOTENCY_TABLE", "MAX_UNITS_PER_ORDER", "MAX_LINES_PER_ORDER"], local.slot_env)
     "order-status"        = ["PRODUCTS_TABLE", "ORDERS_TABLE", "SLOTS_TABLE"]
     "admin-orders"        = ["PRODUCTS_TABLE", "ORDERS_TABLE", "ORDERS_BY_DATE_INDEX", "SLOTS_TABLE"]
-    "admin-products"      = ["PRODUCTS_TABLE", "ASSETS_BUCKET", "CATALOG_KEY", "IMAGES_PREFIX", "ASSETS_BASE_URL"]
+    "admin-products"      = ["PRODUCTS_TABLE", "ASSETS_BUCKET", "AWS_ENDPOINT_URL_S3", "CATALOG_KEY", "IMAGES_PREFIX", "ASSETS_BASE_URL"]
     "admin-stats"         = ["ORDERS_TABLE", "ORDERS_BY_DATE_INDEX"]
     "scheduled-jobs"      = ["PRODUCTS_TABLE", "ORDERS_TABLE", "ORDERS_BY_DATE_INDEX"]
   }
