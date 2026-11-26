@@ -27,7 +27,7 @@ check_config() { curl -fsS "$CF/config.js" | grep -qF "$API"; }
 check_health() { curl -fsS "$API/api/health" | jq -e --arg e "$ENV_NAME" '.status=="ok" and .env==$e'; }
 check_avail()  { curl -fsS "$API/api/availability" | jq -e '(.slots | length) == 22'; }
 check_admin()  { [ "$(status "$API/api/admin/orders")" = "401" ]; }
-check_hsts()   { curl -sSI "$CF/" | grep -qi '^strict-transport-security'; }
+check_hsts()   { curl -sSD - -o /dev/null "$CF/" | grep -qi '^strict-transport-security'; }
 
 FAILED=0
 retry "GET / contiene 'Pan de la Casa'" check_home || FAILED=1
