@@ -1,0 +1,32 @@
+# Configuración de Checkov. Cada omisión está justificada (ver docs/modules/juan-pablo/terraform.md §6).
+directory:
+  - infra
+framework:
+  - terraform
+quiet: true
+skip-check:
+  - CKV_AWS_117 # Lambda en VPC: no accede a recursos privados; una VPC añadiría NAT (~USD 32/mes) y cold start
+  - CKV_AWS_116 # Lambda con DLQ: invocaciones síncronas desde API Gateway no usan DLQ; el scheduler tiene retry_policy
+  - CKV_AWS_272 # Code signing: fuera del alcance del MVP; el código llega solo por pipeline con OIDC
+  - CKV_AWS_115 # Concurrencia reservada: la cuota de la cuenta puede no permitirlo; se usa el throttling de API Gateway
+  - CKV_AWS_173 # Variables de entorno Lambda con KMS CMK: no hay secretos en ellas; CMK cuesta USD 1/mes
+  - CKV_AWS_119 # DynamoDB con KMS CMK: la clave gestionada por AWS es suficiente
+  - CKV_AWS_158 # Log groups con KMS CMK: costo; los logs enmascaran datos personales
+  - CKV_AWS_338 # Retención de logs de 1 año: se usan 14 días por FinOps
+  - CKV_AWS_18  # Access logging de S3: costo y volumen; los access logs de API Gateway cubren la trazabilidad
+  - CKV_AWS_86  # Access logging de CloudFront: costo y volumen
+  - CKV_AWS_144 # Replicación cross-region de S3: RPO/RTO se cumplen con versionado + IaC
+  - CKV_AWS_145 # S3 con KMS CMK: SSE-S3 es suficiente para el MVP
+  - CKV_AWS_68  # WAF en CloudFront: decisión FinOps documentada; se activa en producción real
+  - CKV_AWS_310 # CloudFront origin failover: un solo origen S3 es suficiente para el MVP
+  - CKV_AWS_174 # TLS mínimo en CloudFront: con el certificado por defecto de CloudFront no es configurable
+  - CKV2_AWS_62 # Notificaciones de eventos S3: no se usan
+  - CKV_AWS_309 # Autorización por ruta: las rutas públicas son intencionales; las /admin/* usan JWT
+  - CKV_AWS_300 # Lifecycle de multipart: ya se define abort_incomplete_multipart_upload
+  - CKV2_AWS_32 # Response headers policy: sí hay una (SecurityHeadersPolicy gestionada de AWS) pero se referencia por ID, no como recurso
+  - CKV2_AWS_42 # Certificado SSL propio en CloudFront: no hay dominio propio; se usa el certificado por defecto
+  - CKV2_AWS_47 # WAF con regla Log4j: no hay WAF por decisión FinOps (ver CKV_AWS_68)
+  - CKV_AWS_28  # PITR en DynamoDB: contrato 03 lo exige solo en orders y products; slots e idempotency son efímeras (TTL)
+  - CKV_AWS_297 # Scheduler con CMK: el input solo contiene el nombre del job, sin datos sensibles
+  - CKV_AWS_374 # Restricción geográfica en CloudFront: el sitio es público y puede abrirse desde cualquier país
+  - CKV_AWS_50  # X-Ray en Lambda: la matriz IAM del contrato 03 §6 no incluye X-Ray; la observabilidad usa logs y métricas EMF

@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  workflow_call: {}
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  # Los nombres de estos jobs (branch-policy, backend, infra-static) son los
+  # checks requeridos de github-rulesets/*.json: no cambiarlos sin actualizar los rulesets.
+  branch-policy:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validar origen del PR
+        # github.head_ref lo controla quien abre el PR: va por env, nunca interpolado en run.
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          if [ "$BASE_REF" = "main" ] && [ "$HEAD_REF" != "develop" ]; then
+            echo "::error::A main solo se llega desde develop (recibido: $HEAD_REF)"; exit 1
+          fi
+          if [ "$BASE_REF" = "develop" ] && [[ "$HEAD_REF" != feature/* ]]; then
+            echo "::error::A develop solo se llega desde ramas feature/<cambio> (recibido: $HEAD_REF)"; exit 1
+          fi
+          echo "Origen del PR válido: $HEAD_REF -> $BASE_REF"
+
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+      - name: Instalar dependencias
+        run: python -m pip install -r requirements-dev.txt
+      - name: Lint (ruff check)
+        run: ruff check .
+      - name: Formato (ruff format)
+        run: ruff format --check .
+      - name: Pruebas (pytest, cobertura >= 70 %)
+        run: pytest
+      - name: Subir cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: backend/coverage.xml
+          if-no-files-found: ignore
+
+  infra-static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.x
+          terraform_wrapper: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: terraform fmt
+        run: terraform fmt -check -recursive infra
+      - name: terraform validate (dev y prod)
+        run: |
+          for env in dev prod; do
+            terraform -chdir=infra/envs/$env init -backend=false -input=false
+            terraform -chdir=infra/envs/$env validate
+          done
+      - name: Checkov
+        run: |
+          pip install checkov
+          checkov -d infra --config-file .checkov.yaml
+
+  plan-dev:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    continue-on-error: true # informativo: no bloquea el PR
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_PLAN_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.x
+          terraform_wrapper: false
+      - name: terraform init
+        run: terraform -chdir=infra/envs/dev init -input=false -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+      - name: terraform plan (dev)
+        run: |
+          set +e
+          terraform -chdir=infra/envs/dev plan -lock=false -input=false -no-color \
+            -var alarm_email=placeholder@example.com > plan.txt 2>&1
+          code=$?
+          {
+            echo "### terraform plan (dev)"
+            echo '```'
+            tail -n 60 plan.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $code

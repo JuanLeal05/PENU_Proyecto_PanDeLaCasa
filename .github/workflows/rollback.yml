@@ -1,0 +1,25 @@
+name: Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Tag o SHA a restaurar"
+        required: true
+        type: string
+      environment:
+        description: "Ambiente (lanzar desde develop para dev y desde main para prod)"
+        required: true
+        type: choice
+        options: [dev, prod]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  rollback:
+    uses: ./.github/workflows/_deploy-env.yml
+    with:
+      environment: ${{ inputs.environment }}
+      ref: ${{ inputs.ref }}
