@@ -43,6 +43,12 @@ variable "log_level" {
   default     = "INFO"
 }
 
+variable "lambda_concurrency_quota" {
+  description = "Cuota de ejecuciones concurrentes de Lambda en la cuenta (bootstrap_aws.md §1.4)."
+  type        = number
+  default     = 10
+}
+
 # Throttling (contrato 01 §4)
 variable "api_default_rate" {
   type    = number
