@@ -12,11 +12,11 @@ output "api_base_url" {
 }
 
 output "cloudfront_domain" {
-  value = aws_cloudfront_distribution.main.domain_name
+  value = local.web_domain
 }
 
 output "cloudfront_distribution_id" {
-  value = aws_cloudfront_distribution.main.id
+  value = var.enable_cloudfront ? aws_cloudfront_distribution.main[0].id : ""
 }
 
 output "web_bucket" {

@@ -258,16 +258,18 @@ resource "aws_cloudwatch_dashboard" "operacion" {
         width  = 12
         height = 6
         properties = {
-          title   = "CloudFront: peticiones y tasa de errores"
-          region  = "us-east-1"
+          title   = var.enable_cloudfront ? "CloudFront: peticiones y tasa de errores" : "Web Proxy (sin CloudFront): invocaciones y errores"
+          region  = var.enable_cloudfront ? "us-east-1" : local.region
           view    = "timeSeries"
           stacked = false
           period  = 300
-          metrics = [
-            ["AWS/CloudFront", "Requests", "DistributionId", aws_cloudfront_distribution.main.id, "Region", "Global", { stat = "Sum" }],
-            ["AWS/CloudFront", "4xxErrorRate", "DistributionId", aws_cloudfront_distribution.main.id, "Region", "Global", { stat = "Average", yAxis = "right" }],
-            ["AWS/CloudFront", "5xxErrorRate", "DistributionId", aws_cloudfront_distribution.main.id, "Region", "Global", { stat = "Average", yAxis = "right" }],
-          ]
+          metrics = concat(
+            [for d in aws_cloudfront_distribution.main : ["AWS/CloudFront", "Requests", "DistributionId", d.id, "Region", "Global", { stat = "Sum" }]],
+            [for d in aws_cloudfront_distribution.main : ["AWS/CloudFront", "4xxErrorRate", "DistributionId", d.id, "Region", "Global", { stat = "Average", yAxis = "right" }]],
+            [for d in aws_cloudfront_distribution.main : ["AWS/CloudFront", "5xxErrorRate", "DistributionId", d.id, "Region", "Global", { stat = "Average", yAxis = "right" }]],
+            [for fn in aws_lambda_function.web_proxy : ["AWS/Lambda", "Invocations", "FunctionName", fn.function_name, { stat = "Sum" }]],
+            [for fn in aws_lambda_function.web_proxy : ["AWS/Lambda", "Errors", "FunctionName", fn.function_name, { stat = "Sum", yAxis = "right" }]],
+          )
         }
       },
       # Fila 5: Logs de errores

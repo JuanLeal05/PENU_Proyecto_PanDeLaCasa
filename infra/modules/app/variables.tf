@@ -49,6 +49,12 @@ variable "lambda_concurrency_quota" {
   default     = 10
 }
 
+variable "enable_cloudfront" {
+  description = "Habilitar CloudFront (requiere cuenta AWS verificada). Si es false, HTTP API + Lambda web-proxy sirven los sitios y assets por HTTPS (CR-002)."
+  type        = bool
+  default     = false
+}
+
 # Throttling (contrato 01 §4)
 variable "api_default_rate" {
   type    = number
