@@ -30,3 +30,4 @@ skip-check:
   - CKV_AWS_297 # Scheduler con CMK: el input solo contiene el nombre del job, sin datos sensibles
   - CKV_AWS_374 # Restricción geográfica en CloudFront: el sitio es público y puede abrirse desde cualquier país
   - CKV_AWS_50  # X-Ray en Lambda: la matriz IAM del contrato 03 §6 no incluye X-Ray; la observabilidad usa logs y métricas EMF
+  - CKV_AWS_26  # SNS sin KMS: CloudWatch Alarms no tiene permiso sobre alias/aws/sns y una CMK cuesta USD 1/mes; sin datos sensibles
