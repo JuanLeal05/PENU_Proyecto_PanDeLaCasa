@@ -1,0 +1,76 @@
+name: Deploy de un ambiente (reutilizable)
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      ref:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Activa las variables del environment y, en prod, la aprobación manual.
+    environment: ${{ inputs.environment }}
+    concurrency:
+      group: deploy-${{ inputs.environment }}
+      cancel-in-progress: false
+    env:
+      ENV: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.x
+          terraform_wrapper: false
+      - name: terraform init
+        run: terraform -chdir=infra/envs/$ENV init -input=false -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+      - name: terraform apply
+        run: terraform -chdir=infra/envs/$ENV apply -auto-approve -input=false -var "alarm_email=${{ vars.ALARM_EMAIL }}"
+      - name: Outputs y config.js
+        run: |
+          terraform -chdir=infra/envs/$ENV output -json > outputs.json
+          bash scripts/gen_config.sh outputs.json > config.js
+      - name: Subir frontends a S3
+        run: |
+          WEB=$(jq -r .web_bucket.value outputs.json)
+          aws s3 sync frontend/client "s3://$WEB/" --delete \
+            --exclude "admin/*" --exclude "config.js" --exclude "config.example.js" \
+            --cache-control "max-age=60"
+          aws s3 sync frontend/admin "s3://$WEB/admin/" --delete --cache-control "max-age=60"
+          aws s3 cp config.js "s3://$WEB/config.js" --cache-control "no-cache" --content-type "application/javascript"
+          for f in frontend/client/*.html; do
+            aws s3 cp "$f" "s3://$WEB/$(basename "$f")" --cache-control "no-cache" --content-type "text/html"
+          done
+          aws s3 cp frontend/admin/index.html "s3://$WEB/admin/index.html" --cache-control "no-cache" --content-type "text/html"
+      - name: Invalidar CloudFront
+        run: |
+          DIST_ID="$(jq -r .cloudfront_distribution_id.value outputs.json)"
+          if [ -n "$DIST_ID" ]; then
+            aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths "/*"
+          else
+            echo "Sin distribución CloudFront (CR-002); se omite invalidación."
+          fi
+      - name: Smoke test
+        run: bash scripts/smoke_test.sh outputs.json
+      - name: Resumen
+        run: |
+          {
+            echo "### Ambiente $ENV desplegado (ref ${{ inputs.ref }})"
+            echo "- Sitio: https://$(jq -r .cloudfront_domain.value outputs.json)/"
+            echo "- Admin: https://$(jq -r .cloudfront_domain.value outputs.json)/admin/index.html"
+            echo "- API: $(jq -r .api_base_url.value outputs.json)"
+          } >> "$GITHUB_STEP_SUMMARY"

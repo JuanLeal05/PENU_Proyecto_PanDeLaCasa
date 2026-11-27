@@ -1,0 +1,6 @@
+# Copiar a terraform.tfvars (NO se commitea) y completar.
+github_owner           = "PENUPanaderiaContrerasLeal"
+github_repo            = "PENU_Proyecto_PanDeLaCasa"
+github_oidc_sub_prefix = "repo:PENUPanaderiaContrerasLeal@361710286/PENU_Proyecto_PanDeLaCasa@1471063831"
+budget_emails      = ["correo-juan-pablo@example.com", "correo-juan@example.com"]
+monthly_budget_usd = 20

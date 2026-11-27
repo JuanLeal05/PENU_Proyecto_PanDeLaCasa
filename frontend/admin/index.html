@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pan de la Casa · Panel de administración</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="theme-color" content="#161412" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="/admin/css/admin.css" />
+    <!-- Mismo /config.js de la raíz (ruta absoluta), contrato 04 §5. -->
+    <script src="/config.js"></script>
+    <script type="module" src="/admin/js/main.js"></script>
+  </head>
+  <body>
+    <a class="saltar" href="#vista">Saltar al contenido</a>
+
+    <!-- Pantalla de inicio de sesión (Cognito Hosted UI) -->
+    <main id="pantalla-login" class="login" hidden>
+      <section class="login__marca" aria-hidden="true">
+        <span class="marca__sello">PC</span>
+        <p class="login__frase">El pan del día,<br /><em>en orden.</em></p>
+        <p class="login__pie">Pan de la Casa · Bogotá</p>
+      </section>
+      <section class="login__panel" aria-labelledby="login-titulo">
+        <div class="login__caja">
+          <p class="antetitulo">Panel de administración</p>
+          <h1 id="login-titulo">Ingreso del personal</h1>
+          <p class="login__texto">Usa tu usuario de la panadería. No hay registro público.</p>
+          <p id="mensaje-login" class="aviso" role="alert" hidden></p>
+          <button id="boton-login" class="boton boton--primario boton--ancho" type="button">Iniciar sesión</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Panel -->
+    <div id="pantalla-app" class="app" hidden>
+      <nav class="nav" aria-label="Secciones del panel">
+        <div class="nav__marca">
+          <span class="marca__sello" aria-hidden="true">PC</span>
+          <span class="nav__titulo">Pan de la Casa <span>Administración</span></span>
+        </div>
+        <ul role="list">
+          <li>
+            <a href="#/pedidos">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 4h12v16H6z M9 8h6 M9 12h6 M9 16h4" /></svg>
+              Pedidos
+            </a>
+          </li>
+          <li>
+            <a href="#/productos">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 15c0-4.4 3.6-7 8-7s8 2.6 8 7c0 2-1.6 3-4 3H8c-2.4 0-4-1-4-3Z M9 11l1 3 M13 10.5l.5 3.5" /></svg>
+              Productos
+            </a>
+          </li>
+          <li>
+            <a href="#/inventario">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 8l8-4 8 4v8l-8 4-8-4z M4 8l8 4 8-4 M12 12v8" /></svg>
+              Inventario
+            </a>
+          </li>
+          <li>
+            <a href="#/estadisticas">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 20V10 M12 20V4 M19 20v-7" /></svg>
+              Estadísticas
+            </a>
+          </li>
+        </ul>
+        <div class="nav__sesion">
+          <span id="usuario" class="nav__usuario"></span>
+          <button id="boton-logout" class="boton boton--claro boton--chico" type="button">Cerrar sesión</button>
+        </div>
+      </nav>
+      <p id="notificacion" class="aviso notificacion" role="status" aria-live="polite" hidden></p>
+      <main id="vista" class="contenido vista"></main>
+    </div>
+  </body>
+</html>

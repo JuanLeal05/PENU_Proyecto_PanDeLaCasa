@@ -1,0 +1,18 @@
+# 7. Riesgos y mitigaciones
+
+Escala: probabilidad e impacto **Bajo / Medio / Alto**, evaluados **después** de las mitigaciones ya implementadas (riesgo residual).
+
+| # | Riesgo | Prob. | Impacto | Mitigación | Responsable |
+|---|---|---|---|---|---|
+| R1 | **Sobreventa del último cupo o del último producto** cuando dos clientes piden a la vez | Baja | Alto | Una sola `TransactWriteItems` con condiciones `count < 10` y `stock >= qty`: todo o nada; la perdedora recibe `SLOT_FULL` u `OUT_OF_STOCK` sin descontar nada. Tests de carrera automatizados. | Juan |
+| R2 | **Pedido duplicado** por doble clic o reintento tras un error de red | Baja | Medio | `Idempotency-Key` por intento de compra (TTL 24 h) + botón deshabilitado durante el envío. La repetición devuelve el mismo pedido (200). | Juan |
+| R3 | **Abuso o picos de tráfico** (bots, recargas masivas) | Media | Medio | Throttling de API Gateway (20/40 general; 5/10 en `POST /api/orders`), validación estricta de entrada, catálogo servido desde CDN. **WAF** en CloudFront como mejora opcional (costo vs. beneficio en §4). | Juan Pablo |
+| R4 | **Cuota de concurrencia de Lambda baja** en una cuenta nueva | Media | Medio | La concurrencia estimada es ~1 entorno (§3.6); el throttling actúa antes de agotar la cuota. Si la cuota real es baja, se solicita el aumento en Service Quotas. | Juan Pablo |
+| R5 | **Credenciales expuestas** (llaves en el repositorio o en GitHub) | Baja | Alto | No existen llaves: GitHub → AWS por **OIDC** con un rol por ambiente; el front usa PKCE sin client secret; Checkov y `.gitignore` en CI. | Juan Pablo |
+| R6 | **Costos inesperados** | Baja | Medio | Solo servicios de pago por uso (ningún recurso cobra por hora); AWS Budgets con alertas por email; throttling; imágenes WebP optimizadas en el navegador. | Juan Pablo |
+| R7 | **Pérdida o corrupción de datos** (borrado accidental, error de un despliegue) | Baja | Alto | DynamoDB con **PITR** (restauración a cualquier segundo de los últimos 35 días) y S3 con versionado; borrado de productos solo lógico. Procedimiento de restauración en §5. | Juan Pablo |
+| R8 | **Error en un despliegue** que rompe producción | Media | Alto | CI obligatorio en cada PR (ruff, 270+ tests, cobertura ≥ 70 %, validate, Checkov), `dev` antes que `prod`, **aprobación manual** a prod, smoke test y workflow de rollback a un commit anterior. | Ambos |
+| R9 | **Datos personales** (Ley 1581): fuga o uso indebido | Baja | Alto | Datos mínimos, consentimiento obligatorio, teléfono/email **enmascarados en logs**, 404 si el código no coincide (no se pueden enumerar pedidos), cifrado en reposo, acceso del personal solo con login. Mejora futura: borrar pedidos de más de 12 meses. | Ambos |
+| R10 | **Dependencia de AWS (vendor lock-in)** | Alta | Bajo | Trade-off aceptado y documentado: el dominio (reglas, estados, validaciones) es Python puro y testeable sin AWS; la infraestructura está en Terraform. Migrar implicaría reescribir repositorios y despliegue, no la lógica de negocio. | Ambos |
+| R11 | **Desfase del reloj o de la zona horaria** (pedidos en la franja equivocada) | Baja | Medio | Bogotá con offset fijo UTC−5 (no depende de `tzdata` del runtime); el scheduler usa la zona `America/Bogota`; la hora se inyecta y está cubierta por tests (bordes de 05:59, 18:00, 09:30:01). | Juan |
+| R12 | **El catálogo muestra un precio viejo** justo después de editarlo | Baja | Bajo | El catálogo se regenera con lectura consistente en cada escritura y tiene caché de 60 s; el **precio cobrado siempre sale de la base de datos** al crear el pedido, nunca del cliente. | Juan |

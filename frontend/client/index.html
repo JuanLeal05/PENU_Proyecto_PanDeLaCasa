@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pan de la Casa · Pedidos para recoger</title>
+    <meta name="description" content="Haz tu pedido en Pan de la Casa y recógelo en tienda a la hora que elijas." />
+    <meta name="theme-color" content="#faf7f2" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <!-- La configuración (URLs de la API y del CDN) llega SOLO por /config.js, que genera el pipeline. -->
+    <script src="/config.js"></script>
+    <script type="module" src="/js/main.js"></script>
+  </head>
+  <body>
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+
+    <!-- Banner del "cambio en vivo" de la demo: editar solo este texto. -->
+    <p class="banner" id="banner" role="note">
+      Pedidos de 6:00 a.m. a 6:00 p.m. · Recoge desde las 7:00 a.m. · Pago en tienda
+    </p>
+
+    <header class="encabezado">
+      <div class="encabezado__interior">
+        <a class="marca" href="/index.html" aria-label="Pan de la Casa, inicio">
+          <span class="marca__sello" aria-hidden="true">PC</span>
+          <span class="marca__nombre">Pan de la Casa</span>
+        </a>
+        <nav class="menu" aria-label="Secciones">
+          <a href="#catalogo">Productos</a>
+          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#mis-pedidos">Mis pedidos</a>
+        </nav>
+        <a class="enlace-carrito" href="#carrito">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path d="M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+            <path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+          <span>Tu pedido</span>
+        </a>
+      </div>
+    </header>
+
+    <section class="portada" aria-labelledby="portada-titulo">
+      <div class="portada__texto">
+        <p class="portada__antetitulo">Panadería de barrio · Bogotá</p>
+        <h1 id="portada-titulo">El pan del día,<br /><em>listo cuando llegas</em></h1>
+        <p class="portada__bajada">
+          Elige tus productos, aparta una franja de 30 minutos y recoge en tienda sin hacer fila. Pagas al recoger.
+        </p>
+        <a class="boton boton--primario" href="#catalogo">
+          Ver el pan de hoy <span class="boton__flecha" aria-hidden="true">›</span>
+        </a>
+      </div>
+
+      <div class="portada__arte" aria-hidden="true">
+        <svg class="portada__ilustracion" viewBox="0 0 480 400" focusable="false">
+          <path class="arte__panel" d="M150 70 L440 14 Q460 10 460 32 V352 Q460 372 440 372 H170 Q150 372 150 352 Z" />
+          <g class="arte__trazo">
+            <!-- Hogaza -->
+            <path d="M92 270 C92 196 168 150 262 150 C356 150 420 196 420 262 C420 300 386 318 340 318 H170 C122 318 92 302 92 270 Z" />
+            <path d="M170 196 C196 214 206 238 204 262" />
+            <path d="M226 180 C254 200 266 228 264 258" />
+            <path d="M286 178 C314 198 326 226 324 254" />
+            <path d="M342 192 C364 210 374 232 372 254" />
+            <!-- Espiga -->
+            <path d="M60 330 C96 252 120 180 128 96" />
+            <path d="M126 112 C108 104 98 90 96 74 C112 80 122 92 126 112 Z" />
+            <path d="M128 112 C144 102 152 88 152 72 C138 80 130 94 128 112 Z" />
+            <path d="M120 150 C102 142 92 128 90 112 C106 118 116 130 120 150 Z" />
+            <path d="M122 150 C138 140 146 126 146 110 C132 118 124 132 122 150 Z" />
+            <path d="M110 190 C92 182 82 168 80 152 C96 158 106 170 110 190 Z" />
+            <path d="M112 190 C128 180 136 166 136 150 C122 158 114 172 112 190 Z" />
+          </g>
+        </svg>
+
+        <a class="sello-giratorio" href="#catalogo" tabindex="-1">
+          <svg viewBox="0 0 120 120" focusable="false">
+            <defs>
+              <path id="circulo-sello" d="M60 60 m-46 0 a46 46 0 1 1 92 0 a46 46 0 1 1 -92 0" />
+            </defs>
+            <text class="sello-giratorio__texto">
+              <textPath href="#circulo-sello">HAZ TU PEDIDO · RECOGE EN TIENDA · </textPath>
+            </text>
+          </svg>
+          <span class="sello-giratorio__flecha">↗</span>
+        </a>
+      </div>
+    </section>
+
+    <p id="estado-tienda" class="aviso" role="status" aria-live="polite" hidden></p>
+
+    <main id="contenido" class="layout">
+      <section id="catalogo" class="catalogo" aria-labelledby="catalogo-titulo">
+        <header class="seccion-titulo">
+          <p class="seccion-titulo__antetitulo">Horneado esta mañana</p>
+          <h2 id="catalogo-titulo">Nuestro pan de hoy</h2>
+        </header>
+        <div id="lista-productos" aria-busy="true">
+          <p class="cargando">Cargando el pan del día…</p>
+        </div>
+      </section>
+
+      <aside id="carrito" class="carrito" aria-labelledby="carrito-titulo">
+        <h2 id="carrito-titulo" tabindex="-1">Tu pedido</h2>
+        <ul id="lineas" class="lineas" role="list"></ul>
+        <p class="carrito__total">Total <span id="total">$ 0</span></p>
+        <p id="resumen-limites" class="carrito__limites"></p>
+        <p class="carrito__pago">Pagas en la tienda al recoger.</p>
+
+        <form id="checkout" class="formulario" novalidate>
+          <div class="campo">
+            <label for="franja">Franja de recogida (hoy)</label>
+            <select id="franja" name="franja" required aria-describedby="franja-error"></select>
+            <p id="franja-error" class="campo__error" hidden></p>
+          </div>
+
+          <div class="campo">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" type="text" autocomplete="name" maxlength="60" required
+                   aria-describedby="nombre-error" />
+            <p id="nombre-error" class="campo__error" hidden></p>
+          </div>
+
+          <div class="campo">
+            <label for="celular">Celular</label>
+            <input id="celular" name="celular" type="tel" inputmode="numeric" autocomplete="tel-national"
+                   maxlength="10" placeholder="3001234567" required aria-describedby="celular-ayuda celular-error" />
+            <p id="celular-ayuda" class="campo__ayuda">10 dígitos, empieza por 3. Solo lo usamos para tu pedido.</p>
+            <p id="celular-error" class="campo__error" hidden></p>
+          </div>
+
+          <div class="campo">
+            <label for="email">Correo <span class="opcional">(opcional)</span></label>
+            <input id="email" name="email" type="email" autocomplete="email" maxlength="254"
+                   aria-describedby="email-error" />
+            <p id="email-error" class="campo__error" hidden></p>
+          </div>
+
+          <div class="campo campo--check">
+            <input id="consentimiento" name="consentimiento" type="checkbox" required
+                   aria-describedby="consentimiento-error" />
+            <label for="consentimiento">
+              Autorizo el tratamiento de mis datos personales para gestionar este pedido (Ley 1581 de 2012).
+            </label>
+            <p id="consentimiento-error" class="campo__error" hidden></p>
+          </div>
+
+          <p id="mensaje-checkout" class="aviso" role="alert" hidden></p>
+          <button id="confirmar" class="boton boton--primario boton--ancho" type="submit" disabled>
+            Confirmar pedido
+          </button>
+        </form>
+      </aside>
+    </main>
+
+    <section id="como-funciona" class="banda" aria-labelledby="como-funciona-titulo">
+      <div class="banda__interior">
+        <header class="banda__encabezado">
+          <p class="seccion-titulo__antetitulo">Sin filas, sin esperas</p>
+          <h2 id="como-funciona-titulo">Así funciona</h2>
+        </header>
+        <ol class="pasos" role="list">
+          <li class="pasos__item">
+            <span class="pasos__numero" aria-hidden="true">01</span>
+            <h3>Elige tu pan</h3>
+            <p>Hasta 10 productos distintos y 20 unidades por pedido, según lo que horneamos hoy.</p>
+          </li>
+          <li class="pasos__item">
+            <span class="pasos__numero" aria-hidden="true">02</span>
+            <h3>Aparta tu franja</h3>
+            <p>Escoge una franja de 30 minutos. Cada franja recibe un número limitado de pedidos.</p>
+          </li>
+          <li class="pasos__item">
+            <span class="pasos__numero" aria-hidden="true">03</span>
+            <h3>Recoge y paga</h3>
+            <p>Muestra tu código en la tienda, paga al recoger y llévate el pan recién hecho.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="mis-pedidos" class="mis-pedidos-seccion" aria-labelledby="mis-pedidos-titulo">
+      <header class="seccion-titulo seccion-titulo--izquierda">
+        <p class="seccion-titulo__antetitulo">Guardados en este navegador</p>
+        <h2 id="mis-pedidos-titulo">Mis pedidos de hoy</h2>
+      </header>
+      <div id="lista-mis-pedidos"></div>
+    </section>
+
+    <button id="barra-carrito" class="barra-carrito" type="button" hidden>
+      <span id="barra-carrito-texto">Ver pedido</span>
+    </button>
+
+    <footer class="pie">
+      <div class="pie__interior">
+        <span class="marca">
+          <span class="marca__sello" aria-hidden="true">PC</span>
+          <span class="marca__nombre">Pan de la Casa</span>
+        </span>
+        <p>Bogotá · Pago en tienda al recoger.</p>
+      </div>
+    </footer>
+  </body>
+</html>
