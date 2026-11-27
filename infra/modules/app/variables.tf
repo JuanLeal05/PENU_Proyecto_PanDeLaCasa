@@ -89,7 +89,7 @@ variable "open_time" {
 
 variable "close_time" {
   type    = string
-  default = "20:00"
+  default = "22:00"
 }
 
 variable "first_slot" {
@@ -99,7 +99,7 @@ variable "first_slot" {
 
 variable "last_slot" {
   type    = string
-  default = "19:30"
+  default = "21:30"
 }
 
 variable "slot_minutes" {
