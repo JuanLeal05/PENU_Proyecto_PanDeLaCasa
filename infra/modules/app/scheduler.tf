@@ -30,7 +30,7 @@ resource "aws_iam_role_policy" "scheduler" {
 locals {
   schedules = {
     "reset-stock" = { expression = "cron(30 5 * * ? *)", job = "reset_stock" }
-    "close-day"   = { expression = "cron(30 20 * * ? *)", job = "close_day" }
+    "close-day"   = { expression = "cron(30 22 * * ? *)", job = "close_day" }
   }
 }
 
