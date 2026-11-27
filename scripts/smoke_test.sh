@@ -25,7 +25,7 @@ status() { curl -s -o /dev/null -w '%{http_code}' "$1"; }
 check_home()   { curl -fsS "$CF/" | grep -q "Pan de la Casa"; }
 check_config() { curl -fsS "$CF/config.js" | grep -qF "$API"; }
 check_health() { curl -fsS "$API/api/health" | jq -e --arg e "$ENV_NAME" '.status=="ok" and .env==$e'; }
-check_avail()  { curl -fsS "$API/api/availability" | jq -e '(.slots | length) == 30'; }
+check_avail()  { curl -fsS "$API/api/availability" | jq -e '(.slots | length) == 22'; }
 check_admin()  { [ "$(status "$API/api/admin/orders")" = "401" ]; }
 check_hsts()   { curl -sSD - -o /dev/null "$CF/" | grep -qi '^strict-transport-security'; }
 
@@ -33,7 +33,7 @@ FAILED=0
 retry "GET / contiene 'Pan de la Casa'" check_home || FAILED=1
 retry "GET /config.js contiene apiBase" check_config || FAILED=1
 retry "GET /api/health (status ok, env=$ENV_NAME)" check_health || FAILED=1
-retry "GET /api/availability (30 franjas)" check_avail || FAILED=1
+retry "GET /api/availability (22 franjas)" check_avail || FAILED=1
 retry "GET /api/admin/orders sin token -> 401" check_admin || FAILED=1
 retry "Header strict-transport-security" check_hsts || FAILED=1
 
