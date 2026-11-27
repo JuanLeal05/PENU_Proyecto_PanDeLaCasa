@@ -59,11 +59,12 @@ resource "aws_cloudwatch_query_definition" "api_5xx" {
 }
 
 # -----------------------------------------------------------------------------
-# 2. SNS para notificaciones de alarmas (cifrado con clave gestionada AWS)
+# 2. SNS para notificaciones de alarmas
+# Sin kms_master_key_id = "alias/aws/sns": CloudWatch Alarms no tiene permisos
+# sobre la clave gestionada de SNS (solo funciona con CMK o sin KMS).
 # -----------------------------------------------------------------------------
 resource "aws_sns_topic" "alarmas" {
-  name              = "${local.prefix}-alarmas"
-  kms_master_key_id = "alias/aws/sns"
+  name = "${local.prefix}-alarmas"
 }
 
 resource "aws_sns_topic_subscription" "email" {
